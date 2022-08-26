@@ -7,7 +7,6 @@
             <div class="card">
                 <div class="card-body">
                 <form method="GET" class="text-center" action="{{ route('game') }}">
-                    <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
                     <button class="btn btn-success" type="submit">Start</button>
                 </form>
                 </div>

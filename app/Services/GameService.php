@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Interfaces\IGameService;
+use Illuminate\Support\Facades\Storage;
 
 class GameService implements IGameService
 {
-    public function generateNumber(): string
+    public function generateNumber(): array
     {
         $numbers = '0123456789';
         $number = '';
@@ -63,6 +64,40 @@ class GameService implements IGameService
             $numberPositions[$temp] = $index5 + 1;
         }
 
-        return $number;
+        return ['number' => $number, 'numberPositions' => $numberPositions];
+    }
+
+    public function generateTopPlayers($player): void
+    {
+        $json = Storage::get('top-attempts.json');
+        $data = json_decode($json);
+        if (!$data) {
+            $data = [];
+        }
+        if (count($data) == 0) {
+            $data[] = $player;
+        }
+        else {
+            $lastIndex = count($data) - 1;
+            if (count($data) < 10) {
+                $data[] = $player;
+                $lastIndex++;
+            } elseif ($data[$lastIndex]->attempts > $player->attempts ||
+                ($data[$lastIndex]->$player == $player->attempts)) {
+                $data[$lastIndex] = $player;
+            } else {
+                return;
+            }
+            for ($i = $lastIndex - 1; $i >= 0; $i--) {
+                if ($data[$i]->attempts > $player->attempts ||
+                    ($data[$i]->attempts == $player->attempts)) {
+                    $temp = $data[$i];
+                    $data[$i] = $data;
+                    $data[$i + 1] = $temp;
+                }
+            }
+        }
+        $json = json_encode($data);
+        Storage::put('top-attempts.json', $json);
     }
 }
