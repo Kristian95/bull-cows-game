@@ -11,6 +11,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
+                <p class="text-center">Enter four digit unique number</p>
                 <form method="POST" class="text-center" action="{{ route('guess') }}">
                     <input name="_token" type="hidden" value="{{ csrf_token() }}"/>
                     <div class="form-group">
