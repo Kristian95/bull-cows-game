@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\IGameService;
-use App\Services\GameService;
 use Illuminate\View\View;
 use App\Http\Requests\GuessRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use stdClass;
 
 class GameController extends Controller
@@ -19,11 +19,13 @@ class GameController extends Controller
             session(['name' => Auth::user()->name]);
             session(['numberPositions' => $data['numberPositions']]);
         }
+        if (! session()->has('attemps')) {
+            session(['attemps' => 0]);
+        }
+        echo session('number');
 
-        echo session()->get('number');
-
-        $topTenPlayers = null;//json_decode(Storage::get('top-attempts.json'));
-
+        $topTenPlayers = json_decode(Storage::get('top-attempts.json', true));
+        
         return view('game')->with(compact('topTenPlayers'));
     }
 
@@ -33,8 +35,8 @@ class GameController extends Controller
         $number = session('number');
         $numberPositions = session('numberPositions');
 
-        session()->increment('attempts');
-        session()->save();
+        $attempts = session()->get('attempts', 0); 
+        session()->put('attempts', $attempts + 1);
 
         if ($number == $guessNumber) {
             $player = new stdClass();
@@ -62,6 +64,6 @@ class GameController extends Controller
             }
         }
 
-        return redirect('game')->with(['bulls' => $bulls, 'cows' => $cows, 'attempts' => session('attempts') ]);
+        return redirect('game')->with(['bulls' => $bulls, 'cows' => $cows]);
     }
 }

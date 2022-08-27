@@ -70,29 +70,28 @@ class GameService implements IGameService
     public function generateTopPlayers($player): void
     {
         $json = Storage::get('top-attempts.json');
-        $data = json_decode($json);
+        $data = json_decode($json, true);
         if (!$data) {
             $data = [];
         }
         if (count($data) == 0) {
             $data[] = $player;
-        }
-        else {
+        } else {
             $lastIndex = count($data) - 1;
             if (count($data) < 10) {
                 $data[] = $player;
                 $lastIndex++;
-            } elseif ($data[$lastIndex]->attempts > $player->attempts ||
-                ($data[$lastIndex]->$player == $player->attempts)) {
+            }
+            elseif ($data[$lastIndex]->attempts > $player->attempts || $data[$lastIndex]->attempts == $player->attempts) {
                 $data[$lastIndex] = $player;
-            } else {
+            }
+            else {
                 return;
             }
             for ($i = $lastIndex - 1; $i >= 0; $i--) {
-                if ($data[$i]->attempts > $player->attempts ||
-                    ($data[$i]->attempts == $player->attempts)) {
+                if ($data[$i]['attempts'] > $player->attempts || $data[$i]['attempts'] == $player->attempts ) {
                     $temp = $data[$i];
-                    $data[$i] = $data;
+                    $data[$i] = $player;
                     $data[$i + 1] = $temp;
                 }
             }
