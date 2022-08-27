@@ -22,6 +22,9 @@ class GameController extends Controller
         if (! session()->has('attemps')) {
             session(['attemps' => 0]);
         }
+        if (! Storage::exists('top-attempts.json')) {
+            Storage::put('top-attempts.json', null);
+        }
         $topTenPlayers = json_decode(Storage::get('top-attempts.json', true));
         
         return view('game')->with(compact('topTenPlayers'));
